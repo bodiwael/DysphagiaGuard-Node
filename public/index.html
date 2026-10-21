@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DysphagiaGuard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#fff5f7;--bg2:#eef6ff;--bg3:#effff6;
+  --ink:#22274a;--mute:#6b7194;--card:rgba(255,255,255,.78);--line:rgba(34,39,74,.08);
+  --mint:#12b886;--amber:#f59f00;--coral:#fa5252;--slate:#868e96;
+  --violet:#7950f2;--cyan:#15aabf;--pink:#e64980;--blue:#4c6ef5;--lime:#82c91e;
+  --c:var(--slate);
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink);min-height:100vh;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));background-attachment:fixed;overflow-x:hidden}
+.blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.blobs i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.45;animation:float 18s ease-in-out infinite}
+.blobs i:nth-child(1){width:420px;height:420px;background:#ffc9de;left:-80px;top:-60px}
+.blobs i:nth-child(2){width:480px;height:480px;background:#c5d8ff;right:-120px;top:20%;animation-delay:-6s}
+.blobs i:nth-child(3){width:380px;height:380px;background:#c3f5de;left:30%;bottom:-120px;animation-delay:-11s}
+.blobs i:nth-child(4){width:260px;height:260px;background:#ffe8a3;right:15%;top:-40px;animation-delay:-3s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(60px,40px) scale(1.12)}66%{transform:translate(-40px,70px) scale(.92)}}
+
+header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px clamp(14px,4vw,34px);
+  background:rgba(255,255,255,.7);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.logo{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:20px;color:#fff;
+  background:linear-gradient(135deg,var(--violet),var(--pink),var(--amber));background-size:200% 200%;animation:grad 6s ease infinite;box-shadow:0 6px 18px rgba(121,80,242,.35)}
+@keyframes grad{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+h1{font-size:1.25rem;font-weight:900;letter-spacing:-.3px;background:linear-gradient(90deg,var(--violet),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sp{flex:1}
+.dot{width:11px;height:11px;border-radius:50%;background:#ced4da;box-shadow:0 0 0 0 transparent;transition:.3s}
+.dot.on{background:var(--mint);animation:ping 1.8s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(18,184,134,.55)}100%{box-shadow:0 0 0 12px rgba(18,184,134,0)}}
+.chip,button.chip{font:inherit;font-weight:800;font-size:.85rem;color:var(--ink);background:#fff;border:2px solid transparent;border-radius:999px;padding:8px 14px;cursor:pointer;
+  box-shadow:0 2px 10px rgba(34,39,74,.08);transition:transform .15s,box-shadow .15s,background .2s}
+.chip:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(34,39,74,.14)}
+.chip:active{transform:scale(.96)}
+input.chip{width:170px;cursor:text}
+input.chip:focus{outline:none;border-color:var(--violet)}
+.chip.active{background:linear-gradient(135deg,var(--violet),var(--pink));color:#fff}
+.switch{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:.85rem;cursor:pointer;user-select:none;background:#fff;border-radius:999px;padding:7px 12px;box-shadow:0 2px 10px rgba(34,39,74,.08)}
+.switch input{appearance:none;width:38px;height:22px;border-radius:99px;background:#ced4da;position:relative;cursor:pointer;transition:.25s;margin:0}
+.switch input::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.25s;box-shadow:0 1px 3px #0003}
+.switch input:checked{background:var(--mint)}.switch input:checked::after{left:19px}
+
+main{max-width:1100px;margin:0 auto;padding:22px clamp(14px,4vw,34px) 80px;display:grid;gap:18px}
+.card{position:relative;background:var(--card);backdrop-filter:blur(10px);border:1px solid #fff;border-radius:24px;padding:20px 22px;
+  box-shadow:0 10px 34px rgba(34,39,74,.08);transition:transform .25s,box-shadow .25s;animation:rise .6s both}
+.card::before{content:'';position:absolute;left:22px;right:22px;top:0;height:4px;border-radius:0 0 6px 6px;background:var(--c);transition:background .5s}
+.card.tilt:hover{box-shadow:0 18px 44px rgba(34,39,74,.14)}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.label{font-size:.72rem;font-weight:900;letter-spacing:.12em;color:var(--mute);display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.label .r{margin-left:auto;letter-spacing:0;font-weight:800;color:var(--c)}
+
+.banner{display:none;align-items:center;gap:12px;font-weight:700;background:#fff8e1}
+.banner.show{display:flex;animation:rise .4s both}
+.banner button{margin-left:auto}
+
+.hero{display:grid;grid-template-columns:260px 1fr;gap:26px;align-items:center;--c:var(--slate)}
+.ring{position:relative;width:240px;height:240px;margin:auto}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .halo{position:absolute;inset:18px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--c) 30%,#fff),transparent 70%);animation:breathe 3.2s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(.92);opacity:.7}50%{transform:scale(1.08);opacity:1}}
+.ring .core{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring .ico{width:64px;height:64px;margin:0 auto;color:var(--c);transition:color .5s,transform .4s;line-height:1;filter:drop-shadow(0 6px 10px rgba(0,0,0,.15));transition:transform .4s}
+.ring .state{font-weight:900;font-size:1.5rem;color:var(--c);transition:color .5s;margin-top:6px}
+.ring.flash .ico{animation:pop .7s}
+@keyframes pop{0%{transform:scale(.4) rotate(-20deg)}55%{transform:scale(1.3) rotate(8deg)}100%{transform:scale(1)}}
+.ring .sub{font-size:.8rem;font-weight:800;color:var(--mute)}
+.probs{display:grid;gap:12px}
+.prob{display:grid;grid-template-columns:96px 1fr 46px;gap:10px;align-items:center;font-weight:800}
+.track{height:14px;border-radius:99px;background:rgba(34,39,74,.08);overflow:hidden}
+.fill{height:100%;width:0;border-radius:99px;transition:width .8s cubic-bezier(.2,.9,.2,1);background-size:200% 100%;animation:shine 3s linear infinite}
+@keyframes shine{to{background-position:200% 0}}
+.hint{font-size:.85rem;color:var(--mute);font-weight:700;margin-top:6px}
+.fbrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.pill{display:inline-flex;gap:6px;align-items:center;font-size:.8rem;font-weight:900;background:#fff;border-radius:99px;padding:6px 12px;box-shadow:0 2px 8px rgba(34,39,74,.08)}
+.pill b{color:var(--c2,var(--violet))}
+.pill.flashw{animation:wr .9s}
+@keyframes wr{0%{background:#c3fae8;transform:scale(1.06)}100%{background:#fff;transform:none}}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.chch{font:inherit;font-size:.78rem;font-weight:900;border-radius:99px;padding:5px 11px;cursor:pointer;border:2px solid var(--k);color:var(--k);background:#fff;transition:.2s}
+.chch.on{background:var(--k);color:#fff;box-shadow:0 4px 12px color-mix(in srgb,var(--k) 45%,transparent)}
+.chart{position:relative}
+canvas#wave{width:100%;height:230px;display:block;border-radius:16px;background:linear-gradient(#fff,#f6f8ff)}
+.tip{position:absolute;pointer-events:none;background:#22274aee;color:#fff;font-size:.74rem;font-weight:700;padding:8px 10px;border-radius:10px;display:none;line-height:1.5;white-space:nowrap;z-index:5}
+
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.metric{padding:16px 18px}
+.metric .v{font-size:2rem;font-weight:900;color:var(--c);line-height:1.1}
+.metric .s{font-size:.8rem;font-weight:800;color:var(--mute)}
+.tally{display:flex;height:10px;border-radius:99px;overflow:hidden;margin-top:10px;background:rgba(34,39,74,.08)}
+.tally i{display:block;transition:flex .6s;flex:0}
+
+.manual{display:flex;gap:10px;flex-wrap:wrap}
+.mbtn{flex:1;min-width:130px;font:inherit;font-weight:900;border:0;border-radius:16px;padding:14px;color:#fff;cursor:pointer;background:var(--k);box-shadow:0 8px 20px color-mix(in srgb,var(--k) 40%,transparent);transition:transform .15s,filter .15s}
+.mbtn:hover{transform:translateY(-3px) scale(1.02);filter:brightness(1.07)}.mbtn:active{transform:scale(.95)}
+
+.list{display:grid;gap:10px}
+.ev{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:#fff;border-radius:18px;padding:12px 16px;border-left:6px solid var(--c);cursor:pointer;
+  box-shadow:0 4px 14px rgba(34,39,74,.07);animation:slide .5s both;transition:transform .2s}
+.ev:hover{transform:translateX(5px)}
+@keyframes slide{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+.badge{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb,var(--c) 18%,#fff)}.badge svg{width:24px;height:24px}
+.pulsedot{width:14px;height:14px;border-radius:50%;background:var(--amber);animation:ping2 1.6s infinite}@keyframes ping2{0%{box-shadow:0 0 0 0 rgba(245,159,0,.6)}100%{box-shadow:0 0 0 14px rgba(245,159,0,0)}}
+.quote{margin-top:14px;font-weight:800;font-size:1.02rem;line-height:1.4;background:linear-gradient(90deg,var(--violet),var(--pink),var(--amber));-webkit-background-clip:text;background-clip:text;color:transparent;min-height:1.5em;transition:opacity .4s}
+.bar2{height:8px;border-radius:99px;background:rgba(34,39,74,.08);overflow:hidden}.bar2 i{display:block;height:100%;border-radius:99px;transition:width .6s}
+.ranges{display:grid;gap:10px}.rr{display:grid;grid-template-columns:76px 1fr 84px;gap:10px;align-items:center;font-size:.78rem;font-weight:800}.rt{position:relative;height:16px;border-radius:99px;background:rgba(34,39,74,.08)}.rb{position:absolute;top:0;bottom:0;left:25%;width:50%;border-radius:99px;background:color-mix(in srgb,var(--k) 28%,#fff);border:2px solid var(--k)}.rm{position:absolute;top:-3px;width:6px;height:22px;border-radius:4px;background:var(--ink);transform:translateX(-3px);transition:left .15s}.rm.out{background:var(--coral);box-shadow:0 0 0 4px rgba(250,82,82,.25)}
+.kgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:6px 0 14px}.kc{background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 3px 12px rgba(34,39,74,.07)}.kc b{font-size:1.5rem;color:var(--k)}.kc span{display:block;font-size:.75rem;font-weight:800;color:var(--mute)}
+.mode{display:inline-flex;align-items:center;gap:6px;font-weight:900;font-size:.78rem;border-radius:99px;padding:4px 12px;color:#fff;background:var(--slate)}.mode.ml{background:linear-gradient(90deg,var(--violet),var(--pink))}
+.irr{display:inline-block;margin-left:8px;font-size:.7rem;font-weight:900;color:#fff;background:var(--pink);border-radius:99px;padding:2px 9px;vertical-align:middle}
+.ev small{display:block;color:var(--mute);font-weight:700}
+.ev time{font-weight:900;color:var(--c);font-size:.85rem;text-align:right}
+.ev .more{grid-column:1/-1;display:none;font-size:.82rem;font-weight:700;color:var(--mute);padding-top:8px;border-top:1px dashed var(--line)}
+.ev.open .more{display:block}
+.empty{text-align:center;color:var(--mute);font-weight:800;padding:26px}
+details.card summary{cursor:pointer;font-weight:900;list-style:none}
+.note{font-size:.8rem;font-weight:700;color:var(--mute);text-align:center}
+.confetti{position:fixed;width:10px;height:10px;border-radius:3px;pointer-events:none;z-index:50;animation:conf 1.4s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes conf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+#dbg{position:fixed;left:8px;bottom:6px;font:11px monospace;color:#555;opacity:.75;background:#fffc;padding:3px 8px;border-radius:8px;z-index:9;max-width:95vw}
+.toast{position:fixed;left:50%;bottom:36px;transform:translate(-50%,30px);background:#22274a;color:#fff;font-weight:800;padding:10px 18px;border-radius:99px;opacity:0;transition:.35s;z-index:60}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:800px){.hero{grid-template-columns:1fr}.grid4{grid-template-columns:repeat(2,1fr)}input.chip{width:130px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="blobs"><i></i><i></i><i></i><i></i></div>
+
+<header>
+  <div class="logo"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-5 4 10 3-7 2 2h5"/></svg></div><h1>DysphagiaGuard</h1>
+  <span class="dot" id="dot" title="Firebase connection"></span>
+  <span class="sp"></span>
+  <input class="chip" id="device" aria-label="Device ID" placeholder="Device ID" spellcheck="false">
+  <label class="switch" title="Write the decided status to devices/&lt;id&gt;/status so the OLED shows it"><input type="checkbox" id="writeSt" checked> Write status</label>
+  <label class="switch"><input type="checkbox" id="sync"> Log events</label>
+  <button class="chip" id="recalTop">Recalibrate</button>
+  <button class="chip" id="demoBtn">Demo</button>
+</header>
+
+<main>
+  <section class="card banner" id="calib" style="--c:var(--violet)">
+    <span class="pulsedot" style="background:var(--violet)"></span>
+    <div style="flex:1"><b id="calTxt">Calibrating for 20 seconds. Keep the wearable in its normal position.</b>
+      <div class="bar2" style="margin-top:8px"><i id="calBar" style="width:0;background:linear-gradient(90deg,var(--violet),var(--pink))"></i></div></div>
+  </section>
+
+  <section class="card banner" id="noSignal" style="--c:var(--amber)">
+    <span class="pulsedot"></span><span>Waiting for data from the wearable. Check that it is powered and on WiFi, or try the demo.</span>
+    <button class="chip" id="noSignalDemo">Run demo</button>
+  </section>
+
+  <section class="card hero tilt" id="hero">
+    <div class="ring" id="ring">
+      <div class="halo"></div>
+      <svg viewBox="0 0 240 240"><circle cx="120" cy="120" r="108" fill="none" stroke="rgba(34,39,74,.08)" stroke-width="12"/>
+        <circle id="arc" cx="120" cy="120" r="108" fill="none" stroke="var(--c)" stroke-width="12" stroke-linecap="round" stroke-dasharray="678.6" stroke-dashoffset="678.6" style="transition:stroke-dashoffset .4s,stroke .5s"/></svg>
+      <div class="core"><div class="ico" id="ico"></div><div class="state" id="state">Listening…</div><div class="sub" id="ringsub">buffering</div></div>
+    </div>
+    <div>
+      <div class="label">LATEST DECISION (range check on the 6 readings)</div>
+      <div class="probs">
+        <div class="prob"><span>Normal</span><div class="track"><div class="fill" id="p0" style="background-image:linear-gradient(90deg,#0ca678,#38d9a9,#0ca678)"></div></div><output id="o0">0%</output></div>
+        <div class="prob"><span>Delayed</span><div class="track"><div class="fill" id="p1" style="background-image:linear-gradient(90deg,#f08c00,#ffd43b,#f08c00)"></div></div><output id="o1">0%</output></div>
+        <div class="prob"><span>Aspiration</span><div class="track"><div class="fill" id="p2" style="background-image:linear-gradient(90deg,#e03131,#ff8787,#e03131)"></div></div><output id="o2">0%</output></div>
+      </div>
+      <div class="hint" id="heroHint">Calibrating for 20 seconds, then every window is checked against that range.</div>
+      <div class="quote" id="quote"></div>
+      <div class="fbrow">
+        <span class="pill">Firebase status: <b id="fbNow">–</b></span>
+        <span class="pill" id="wrPill">Last written: <b id="fbWrote">–</b></span>
+        <span class="pill"><b id="rate">–</b></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card tilt" style="--c:var(--violet)">
+    <div class="label">LIVE SENSORS · tap to show or hide<span class="r"><button class="chip" id="pauseBtn" style="padding:4px 12px">Pause</button></span></div>
+    <div class="chips" id="chips"></div>
+    <div class="chart"><canvas id="wave"></canvas><div class="tip" id="tip"></div></div>
+  </section>
+
+  <div class="grid4">
+    <section class="card metric" id="mClass" style="--c:var(--slate)"><div class="label">STATUS</div><div class="v" id="mv">–</div><div class="s" id="ms">waiting</div></section>
+    <section class="card metric" style="--c:var(--pink)"><div class="label">STATUS CHANGES</div><div class="v" id="count">0</div><div class="s">this session</div>
+      <div class="tally"><i id="t0" style="background:var(--mint)"></i><i id="t1" style="background:var(--amber)"></i><i id="t2" style="background:var(--coral)"></i></div></section>
+    <section class="card metric" style="--c:var(--cyan)"><div class="label">DEVIATION</div><div class="v" id="peak">–</div><div class="s">sigma from baseline</div></section>
+    <section class="card metric" style="--c:var(--lime)"><div class="label">OUT OF RANGE</div><div class="v" id="dur">–</div><div class="s">share of last window</div></section>
+  </div>
+
+  <section class="card tilt" style="--c:var(--blue)">
+    <div class="label">CALIBRATED RANGE<span class="r"><button class="chip" id="recalBtn" style="padding:4px 12px">Recalibrate (20 s)</button></span></div>
+    <div class="hint" style="margin:0 0 12px">For the first 20 seconds the page learns the normal range of all six readings. After that, anything inside the shaded band is Normal. A moderate excursion becomes Delayed and a strong one becomes Aspiration, and the status is written to Firebase automatically.</div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+      <b style="font-size:.85rem">Sensitivity</b><span class="hint" style="margin:0">strict</span>
+      <input type="range" id="sens" min="2" max="10" step="0.5" style="flex:1;min-width:160px;accent-color:#7950f2">
+      <span class="hint" style="margin:0">relaxed</span><span class="pill" id="sensV"></span>
+    </div>
+    <div id="ranges" class="ranges"></div>
+  </section>
+
+  <section class="card tilt" style="--c:var(--pink)">
+    <div class="label">SET STATUS MANUALLY</div>
+    <div class="manual">
+      <button class="mbtn" style="--k:var(--mint)" data-st="Normal">Normal</button>
+      <button class="mbtn" style="--k:var(--amber)" data-st="Delayed">Delayed</button>
+      <button class="mbtn" style="--k:var(--coral)" data-st="Aspiration">Aspiration</button>
+    </div>
+  </section>
+
+  <section>
+    <div class="label" style="margin-bottom:12px">EVENT HISTORY · click an event for details<span class="r"><button class="chip" id="clearBtn" style="padding:4px 12px">Clear</button></span></div>
+    <div class="list" id="list"><div class="card empty" style="--c:var(--slate)">No swallow events yet. They appear here as soon as one is detected.</div></div>
+  </section>
+
+
+  <div class="note">The status is decided in your browser from the six accelerometer and gyroscope readings in Firebase, then written to <code>status</code> for the wearable. This is a monitoring aid, not a medical diagnosis.</div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getDatabase, ref, onValue, push, set, get } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+/* ---------- config ---------- */
+const FIREBASE = {
+  apiKey: 'AIzaSyAitjUwikrfTdb7bIudN3DMM7lPRz87WQU',
+  authDomain: 'abdelrahman-wael.firebaseapp.com',
+  databaseURL: 'https://abdelrahman-wael-default-rtdb.firebaseio.com',
+  projectId: 'abdelrahman-wael',
+  storageBucket: 'abdelrahman-wael.firebasestorage.app',
+  messagingSenderId: '786188074556',
+  appId: '1:786188074556:web:35cc898da40fbb3c7e4d39'
+};
+const FW = { databaseURL: 'https://bioflex-237aa-default-rtdb.firebaseio.com', device: 'device01' }; // optional extra source: raw 0.5 s windows
+const BUILD = 'B10 2026-10-21';
+const WIN_MS = 2000, KEEP_MS = 4000, PLOT_MAX = 400, HISTORY_MAX = 40;
+const CH = [['ax', 'Accel X', '#4c6ef5'], ['ay', 'Accel Y', '#15aabf'], ['az', 'Accel Z', '#12b886'], ['gx', 'Gyro X', '#f59f00'], ['gy', 'Gyro Y', '#fa5252'], ['gz', 'Gyro Z', '#be4bdb']];
+const ICO = {
+  ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z"/><path d="M12 10v4.5M12 17.5v.1"/></svg>',
+  wave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l2-6 3 12 3-9 2 3h7"/></svg>'
+};
+const CLASSES = [
+  { name: 'Normal', color: '#12b886', ico: ICO.ok, sub: 'Smooth, well-timed swallow' },
+  { name: 'Delayed', color: '#f59f00', ico: ICO.clock, sub: 'Slow or incomplete swallow' },
+  { name: 'Aspiration', color: '#fa5252', ico: ICO.warn, sub: 'Possible aspiration, review recommended' },
+  { name: 'Listening…', color: '#868e96', ico: ICO.wave, sub: '' }
+];
+const UNKNOWN = 3;
+const $ = id => document.getElementById(id);
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
+const median = a => { const b = [...a].sort((x, y) => x - y), m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
+const arr = v => Array.isArray(v) ? v : v && typeof v === 'object' ? Object.values(v) : [];
+const toast = m => { const t = $('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 2200); };
+
+/* ---------- state ---------- */
+const S = { state: 3, lastScore: 0, mode: 'live', unsub: null, simTimer: null, buffer: [], base: null, lastT: null, lastSample: 0, connected: false, fwSeen: false,
+  plot: [], hidden: new Set(), paused: false, history: [], tally: [0, 0, 0], current: UNKNOWN, refractory: 0, rate: 0,
+  fbStatus: null, lastWritten: null, fill: 0 };
+const app = initializeApp(FIREBASE);
+const db = getDatabase(app);
+let fwDb = null; try { fwDb = getDatabase(initializeApp({ databaseURL: FW.databaseURL }, 'fw')); } catch (e) { console.warn('fw db', e); }
+$('device').value = localStorage.getItem('dg-device') || 'dysphagiaguard-01';
+const devId = () => $('device').value.trim() || 'dysphagiaguard-01';
+
+/* ---------- Calibration (5 s) + range check on the 6 readings ---------- */
+const CAL_MS = 20000, KEYS = ['ax', 'ay', 'az', 'gx', 'gy', 'gz'];
+const CAL = { active: true, start: 0, samples: [], stats: null, k: Number(localStorage.getItem('dg-k2')) || 4 };
+let pendingN = 0;
+function calReset() { CAL.active = true; CAL.start = 0; CAL.samples = []; CAL.stats = null; S.state = UNKNOWN; S.current = UNKNOWN; pendingN = 0; S.buffer = []; render(null); }
+function calFeed(s) {
+  if (!CAL.start) CAL.start = Date.now();
+  CAL.samples.push(s);
+  if (Date.now() - CAL.start >= CAL_MS && CAL.samples.length >= 20) calFinish();
+}
+function calFinish() {
+  const st = {};
+  KEYS.forEach(k => { const v = CAL.samples.map(x => x[k]), m = mean(v), sd = Math.sqrt(mean(v.map(a => (a - m) ** 2))), rg = Math.max(...v) - Math.min(...v);
+    st[k] = { m, sd: Math.max(sd, rg * 0.04, 1e-3) }; });
+  CAL.stats = st; CAL.active = false; CAL.samples = []; S.buffer = []; S.state = UNKNOWN;
+  toast('Calibrated. Signals in this range count as Normal.');
+}
+function scoreWin(win) { // deviation in calibrated sigmas: worst single sample, or a change in activity level (spread) vs calibration
+  let best = 0, ch = 'ax', out = 0;
+  KEYS.forEach(k => { const st = CAL.stats[k], zs = win.map(x => Math.abs(x[k] - st.m) / st.sd);
+    const maxZ = Math.max(...zs), m = mean(win.map(x => x[k])), spread = Math.sqrt(mean(win.map(x => (x[k] - m) ** 2))) / st.sd;
+    const sc = Math.max(maxZ, spread * 0.75 * CAL.k, Math.abs(m - st.m) / st.sd * 1.5); // outlier | busier/quieter than calibrated | shifted baseline
+    if (sc > best) { best = sc; ch = k; } });
+  win.forEach(x => { if (KEYS.some(k => Math.abs(x[k] - CAL.stats[k].m) / CAL.stats[k].sd > CAL.k)) out++; });
+  return { score: best, ch, outPct: out / win.length * 100 };
+}
+const probsFor = q => q <= 1 ? [1 - .5 * q, .5 * q, 0] : q <= 2 ? [.5 - .5 * (q - 1), .5, .5 * (q - 1)] : q <= 3 ? [0, .5 - .5 * (q - 2), .5 + .5 * (q - 2)] : [0, 0, 1];
+const CHN = { ax: 'Accel X', ay: 'Accel Y', az: 'Accel Z', gx: 'Gyro X', gy: 'Gyro Y', gz: 'Gyro Z' };
+function analyse(win) {
+  if (CAL.active || !CAL.stats || !win.length) return;
+  const { score, ch, outPct } = scoreWin(win), q = score / CAL.k, cls = q <= 1 ? 0 : q <= 2 ? 1 : 2, p = probsFor(q);
+  const r = { cls, p, conf: Math.max(...p), t: new Date(), score, ch, outPct, n: win.length, src: 'range' };
+  S.lastScore = score;
+  if (cls === S.state) { pendingN = 0; render(r); return; }
+  if (S.state === UNKNOWN || cls > S.state) { S.state = cls; pendingN = 0; onResult(r); return; }
+  if (++pendingN >= 2) { S.state = cls; pendingN = 0; onResult(r); } else render(r);
+}
+
+/* ---------- Firebase status: read + write ---------- */
+function writeStatus(label, conf, why, r) {
+  if (!$('writeSt').checked || S.mode !== 'live') return;
+  if (S.fbStatus === label && why === 'auto') { return; }
+  S.lastWritten = label;
+  set(ref(db, `devices/${devId()}/status`), label).then(() => {
+    $('fbWrote').textContent = label + ' · ' + new Date().toLocaleTimeString([], { hour12: false });
+    $('wrPill').classList.remove('flashw'); void $('wrPill').offsetWidth; $('wrPill').classList.add('flashw');
+    set(ref(db, `devices/${devId()}/statusMeta`), { label, confidence: Math.round((conf || 0) * 100) / 100, by: why === 'manual' ? 'web-manual' : 'web-range-check', deviation: r?.score != null ? Math.round(r.score * 10) / 10 : null, channel: r?.ch || null, ts: Date.now() }).catch(() => {});
+  }).catch(e => { toast('Could not write status: ' + e.message); console.error(e); });
+}
+
+/* ---------- feeds ---------- */
+function stopFeeds() { S.unsub?.(); S.unsub = null; clearInterval(S.simTimer); S.simTimer = null; }
+function resetSession() {
+  calReset();
+  S.buffer = []; S.plot = []; S.base = null; S.lastT = null; S.rate = 0; S.refractory = 0; S.fwSeen = false; S.fill = 0;
+  S.history = []; S.tally = [0, 0, 0]; S.current = UNKNOWN; S.state = UNKNOWN;
+  $('list').innerHTML = '<div class="card empty" style="--c:var(--slate)">No swallow events yet. They appear here as soon as one is detected.</div>';
+  render(null);
+}
+function startLive() {
+  stopFeeds(); S.mode = 'live'; resetSession();
+  $('demoBtn').classList.remove('active'); $('demoBtn').textContent = 'Demo';
+  const id = devId();
+  const offs = [];
+  offs.push(onValue(ref(db, '.info/connected'), snap => setConnected(!!snap.val())));
+  offs.push(onValue(ref(db, `devices/${id}/live`), snap => {
+    const d = snap.val(); if (!d || typeof d !== 'object') return;
+    const n = v => Number(v) || 0;
+    onSample({ ax: n(d.ax), ay: n(d.ay), az: n(d.az), gx: n(d.gx), gy: n(d.gy), gz: n(d.gz), t: n(d.t) });
+  }, err => { console.error(err); setConnected(false); $('noSignal').querySelector('span:nth-child(2)').textContent = 'Firebase error: ' + err.message; }));
+  offs.push(onValue(ref(db, `devices/${id}/status`), snap => { S.fbStatus = snap.val(); $('fbNow').textContent = S.fbStatus ?? '–'; }));
+  if (fwDb) { let first = true, lastKey = null;
+    offs.push(onValue(ref(fwDb, `dysphagiaGuard/${FW.device}/latest`), snap => {
+      const d = snap.val(); if (!d || typeof d !== 'object') { first = false; return; }
+      const key = String(d.windowStartMs) + ':' + (d.sampleCount || 0);
+      if (key === lastKey) return; lastKey = key; if (first) { first = false; return; }
+      onWindow(d);
+    }, err => console.warn('firmware db:', err.message))); }
+  S.unsub = () => offs.forEach(f => { try { f(); } catch (e) {} });
+}
+function startDemo() {
+  stopFeeds(); S.mode = 'demo'; resetSession(); setConnected(true);
+  $('demoBtn').classList.add('active'); $('demoBtn').textContent = 'Stop demo';
+  let tick = 0, k = 0, plan = null;
+  const g = () => (Math.random() + Math.random() + Math.random() - 1.5) * 0.9;
+  const bump = (t, c, s, a) => a * Math.exp(-((t - c) ** 2) / (2 * s * s));
+  S.simTimer = setInterval(() => {
+    for (let r = 0; r < 2; r++) {
+      if (k % 300 === 0) { const x = Math.random(); plan = { kind: x < .5 ? 'n' : x < .8 ? 'd' : 'a', off: .25 + Math.random() * .3, sign: Math.random() < .5 ? -1 : 1 }; }
+      const t = (k % 300) / 100; let m = 0;
+      if (plan.kind === 'n') m = bump(t, plan.off + .2, .12, 10);
+      if (plan.kind === 'd') m = bump(t, .95, .3, 6);
+      if (plan.kind === 'a') m = bump(t, plan.off + .2, .12, 10) + bump(t, plan.off + 1.1, .12, 4.5);
+      onSample({ ax: g() * .02 + .02, ay: g() * .02, az: 1 + g() * .004 + m * .028, gx: 0.8 + g() * .25 + m * plan.sign, gy: -0.4 + g() * .25 + m * .3, gz: 0.2 + g() * .25, t: ++tick * 10 });
+      k++;
+    }
+  }, 20);
+}
+function setConnected(c) { S.connected = c; $('dot').classList.toggle('on', c); }
+
+function pushPlot(s) { S.plot.push(s); if (S.plot.length > PLOT_MAX) S.plot.shift(); }
+function onSample(s) {
+  if (S.mode === 'live' && s.t === S.lastT) return;
+  S.lastT = s.t; S.lastSample = Date.now(); setConnected(true);
+  if (!S.paused) pushPlot(s);
+  if (CAL.active) { calFeed(s); return; }
+  S.buffer.push(s);
+  const cut = s.t - KEEP_MS; while (S.buffer.length && S.buffer[0].t < cut) S.buffer.shift();
+}
+function onWindow(d) { // optional 0.5 s raw windows from the ESP32 firmware project
+  const A = ['accelX', 'accelY', 'accelZ', 'gyroX', 'gyroY', 'gyroZ'].map(k => arr(d[k]).map(Number));
+  const n = Math.min(...A.map(a => a.length)); if (n < 10) return;
+  const win = Array.from({ length: n }, (_, i) => ({ ax: A[0][i], ay: A[1][i], az: A[2][i], gx: A[3][i], gy: A[4][i], gz: A[5][i], t: i * 10 }));
+  S.lastSample = Date.now(); S.fwSeen = true; setConnected(true); S.fill = 1;
+  win.forEach(pushPlot);
+  if (CAL.active) { win.forEach(calFeed); return; }
+  analyse(win);
+}
+function tick() { // once per second: analyse the last 2 s of live samples
+  if (S.mode === 'demo') {
+    if (S.buffer.length < 200) return;
+    analyse(S.buffer.slice(-200)); return;
+  }
+  if (S.buffer.length < 8 || Date.now() - S.lastSample > 3000 ) return;
+  const last = S.buffer.at(-1).t, win = S.buffer.filter(x => x.t >= last - WIN_MS);
+  const span = (win.at(-1).t - win[0].t) / 1000;
+  if (win.length < 8 || span < 1.0) return;
+  S.rate = (win.length - 1) / span; analyse(win);
+}
+setInterval(() => { try { tick(); } catch (e) { D.err = 'tick: ' + e.message; console.error(e); } }, 500);
+
+function onResult(r) { // a status transition
+  S.current = r.cls; render(r);
+  S.history.unshift(r); if (S.history.length > HISTORY_MAX) S.history.pop();
+  S.tally[r.cls]++;
+  addTile(r); render(r);
+  $('ring').classList.remove('flash'); void $('ring').offsetWidth; $('ring').classList.add('flash');
+  confetti(CLASSES[r.cls].color);
+  writeStatus(CLASSES[r.cls].name, r.conf, 'auto', r);
+  if ($('sync').checked && S.mode === 'live')
+    set(push(ref(db, `devices/${devId()}/events`)), { cls: r.cls, label: CLASSES[r.cls].name, confidence: r.conf, score: r.score, ts: Date.now() }).catch(e => console.warn('log failed', e.message));
+}
+
+/* ---------- render ---------- */
+const anim = (el, to, fmt = v => Math.round(v)) => { const from = Number(el.dataset.v || 0); el.dataset.v = to; const t0 = performance.now();
+  (function f(t) { const k = clamp((t - t0) / 500, 0, 1), e = 1 - (1 - k) ** 3; el.textContent = fmt(from + (to - from) * e); if (k < 1) requestAnimationFrame(f); })(t0); };
+let lastShown = null;
+function render(r) {
+  const cls = r ? r.cls : S.current, c = CLASSES[cls];
+  document.querySelectorAll('#hero,#mClass').forEach(el => el.style.setProperty('--c', c.color));
+  $('ico').innerHTML = c.ico; $('state').textContent = CAL.active ? 'Calibrating' : c.name; $('mv').textContent = cls === UNKNOWN ? '–' : c.name;
+  $('ms').textContent = CAL.active ? 'calibrating' : r && cls !== UNKNOWN ? (cls === 0 ? 'in range' : 'outside range') : 'watching';
+  const p = r ? r.p : [0, 0, 0];
+  p.forEach((v, i) => { $('p' + i).style.width = v * 100 + '%'; $('o' + i).textContent = Math.round(v * 100) + '%'; });
+  if (r && r.cls !== UNKNOWN && r.score != null) {
+    const msg = r.cls === 0 ? 'Signals are within your calibrated range.' : `Irregular: ${CHN[r.ch]} is ${r.score.toFixed(1)} sigma from your baseline.`;
+    $('heroHint').textContent = msg + ' Checked at ' + r.t.toLocaleTimeString() + '.';
+    say(r.cls); anim($('peak'), r.score, v => v.toFixed(1)); anim($('dur'), r.outPct, v => Math.round(v) + '%');
+  }
+  anim($('count'), S.history.length);
+  const tot = S.tally.reduce((a, b) => a + b, 0) || 1;
+  S.tally.forEach((v, i) => $('t' + i).style.flex = v / tot);
+}
+const SAY = [['Smooth and steady. Keep it up.', 'A safe swallow is a small win. Well done.', 'Calm, upright, unhurried. That is the way.'],
+  ['Take your time. Slow and steady is fine.', 'Small sips, small bites. No rush.', 'Pause, breathe, and try again gently.'],
+  ['Stop and check in with your care team.', 'Safety first. Pause eating or drinking.', 'Better to ask for help early.']];
+const IDLE = ['Every safe swallow counts.', 'Small steps build strong habits.', 'Listening quietly, ready when you are.', 'Progress, one swallow at a time.'];
+let sayI = 0;
+function say(cls, idle) { const q = $('quote'); const list = idle ? IDLE : SAY[cls]; q.style.opacity = 0; setTimeout(() => { q.textContent = list[(sayI++) % list.length]; q.style.opacity = 1; }, 250); }
+setInterval(() => { if (S.current === UNKNOWN) say(0, true); }, 9000);
+function addTile(r) {
+  const l = $('list'); if (l.querySelector('.empty')) l.innerHTML = '';
+  const e = document.createElement('div'); e.className = 'ev'; e.style.setProperty('--c', CLASSES[r.cls].color);
+  e.innerHTML = `<span class="badge">${CLASSES[r.cls].ico}</span><div><b>${CLASSES[r.cls].name}</b><small>${r.cls === 0 ? 'Back within the calibrated range' : CLASSES[r.cls].sub}</small></div><time>${r.t.toLocaleTimeString([], { hour12: false })} · ${Math.round(r.conf * 100)}%</time>
+  <div class="more">Deviation ${r.score.toFixed(1)} sigma on ${CHN[r.ch]} · ${Math.round(r.outPct)}% of samples out of range · ${r.n} samples · probabilities N ${Math.round(r.p[0] * 100)}% / D ${Math.round(r.p[1] * 100)}% / A ${Math.round(r.p[2] * 100)}%</div>`;
+  e.onclick = () => e.classList.toggle('open');
+  l.prepend(e); while (l.children.length > HISTORY_MAX) l.lastChild.remove();
+}
+function confetti(color) {
+  const rc = $('ring').getBoundingClientRect(), cx = rc.left + rc.width / 2, cy = rc.top + rc.height / 2, cols = [color, '#7950f2', '#e64980', '#f59f00', '#15aabf'];
+  for (let i = 0; i < 22; i++) { const d = document.createElement('i'); d.className = 'confetti'; const a = Math.random() * 6.28, v = 80 + Math.random() * 140;
+    d.style.cssText = `left:${cx}px;top:${cy}px;background:${cols[i % 5]};--dx:${Math.cos(a) * v}px;--dy:${Math.sin(a) * v + 60}px;--r:${Math.random() * 720}deg`;
+    document.body.appendChild(d); setTimeout(() => d.remove(), 1500); }
+}
+
+/* ---------- chart ---------- */
+const chips = $('chips');
+CH.forEach(([k, name, col]) => { const b = document.createElement('button'); b.className = 'chch on'; b.style.setProperty('--k', col); b.textContent = name;
+  b.onclick = () => { S.hidden.has(k) ? S.hidden.delete(k) : S.hidden.add(k); b.classList.toggle('on', !S.hidden.has(k)); }; chips.appendChild(b); });
+const cv = $('wave'), cx = cv.getContext('2d'); let hoverX = null;
+cv.addEventListener('mousemove', e => { hoverX = e.offsetX; }); cv.addEventListener('mouseleave', () => { hoverX = null; $('tip').style.display = 'none'; });
+function drawChart() {
+  const dpr = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+  if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, w, h);
+  cx.strokeStyle = 'rgba(34,39,74,.07)'; cx.lineWidth = 1;
+  for (let i = 1; i < 5; i++) { cx.beginPath(); cx.moveTo(0, h * i / 5); cx.lineTo(w, h * i / 5); cx.stroke(); }
+  const d = S.plot; if (d.length < 3) { cx.fillStyle = '#6b7194'; cx.font = '700 14px Nunito,sans-serif'; cx.fillText('Waiting for sensor data…', 16, h / 2); return; }
+  CH.forEach(([k, , col]) => { if (S.hidden.has(k)) return;
+    let lo = Infinity, hi = -Infinity; for (const s of d) { if (s[k] < lo) lo = s[k]; if (s[k] > hi) hi = s[k]; }
+    const sp = Math.max(hi - lo, 1e-6);
+    cx.beginPath(); d.forEach((s, i) => { const x = i / (PLOT_MAX - 1) * w + (w - (d.length - 1) / (PLOT_MAX - 1) * w), y = h - 10 - (s[k] - lo) / sp * (h - 20); i ? cx.lineTo(x, y) : cx.moveTo(x, y); });
+    cx.lineWidth = 2.2; cx.lineJoin = 'round'; cx.strokeStyle = col; cx.stroke(); });
+  if (hoverX != null) { const off = w - (d.length - 1) / (PLOT_MAX - 1) * w, i = clamp(Math.round((hoverX - off) / w * (PLOT_MAX - 1)), 0, d.length - 1), s = d[i];
+    cx.strokeStyle = 'rgba(34,39,74,.35)'; cx.beginPath(); cx.moveTo(hoverX, 0); cx.lineTo(hoverX, h); cx.stroke();
+    const tip = $('tip'); tip.style.display = 'block'; tip.style.left = Math.min(hoverX + 14, w - 150) + 'px'; tip.style.top = '10px';
+    tip.innerHTML = CH.map(([k, n, col]) => `<span style="color:${col}">●</span> ${n}: ${s[k].toFixed(2)}`).join('<br>'); }
+}
+$('pauseBtn').onclick = () => { S.paused = !S.paused; $('pauseBtn').textContent = S.paused ? 'Resume' : 'Pause'; };
+
+/* ---------- frame loop ---------- */
+function frame() {
+  drawChart();
+  const noData = S.mode === 'live' && !CAL.active && (!S.connected || (S.lastSample && Date.now() - S.lastSample > 15000 && !S.fwSeen));
+  $('noSignal').classList.toggle('show', noData);
+  if (S.connected && S.mode === 'live' && S.lastSample && Date.now() - S.lastSample > 15000 && !S.fwSeen) $('dot').classList.remove('on');
+  const calP = CAL.active ? (CAL.start ? clamp((Date.now() - CAL.start) / CAL_MS, 0, 1) : 0) : 1;
+  $('calib').classList.toggle('show', CAL.active && (S.connected || S.mode === 'demo'));
+  $('calBar').style.width = calP * 100 + '%';
+  $('calTxt').textContent = CAL.start ? `Calibrating, ${Math.max(0, Math.ceil(CAL_MS / 1000 * (1 - calP)))} s left. Keep the wearable in its normal position.` : 'Waiting for the first sensor reading to start calibrating...';
+  updateRanges();
+  S.fill = Math.max(0, S.fill - 0.012);
+  const span = S.buffer.length > 1 ? S.buffer.at(-1).t - S.buffer[0].t : 0;
+  const bp = CAL.active ? calP : 1;
+  $('arc').style.strokeDashoffset = 678.6 * (1 - bp);
+  $('ringsub').textContent = CAL.active ? 'calibrating ' + Math.round(bp * 100) + '%' : S.lastScore ? S.lastScore.toFixed(1) + ' sigma from baseline' : 'watching';
+  $('rate').textContent = S.rate ? S.rate.toFixed(1) + ' Hz' : '–';
+  requestAnimationFrame(frame);
+}
+
+/* ---------- events ---------- */
+$('demoBtn').onclick = () => S.mode === 'demo' ? startLive() : startDemo();
+$('noSignalDemo').onclick = startDemo;
+$('device').onchange = () => { try { localStorage.setItem('dg-device', devId()); } catch (e) {} if (S.mode === 'live') startLive(); };
+$('clearBtn').onclick = () => { S.history = []; S.tally = [0, 0, 0]; $('list').innerHTML = '<div class="card empty" style="--c:var(--slate)">Cleared.</div>'; render(null); };
+document.querySelectorAll('.mbtn').forEach(b => b.onclick = () => {
+  const label = b.dataset.st, i = CLASSES.findIndex(c => c.name === label);
+  if (S.mode !== 'live') { toast('Stop the demo first to write to Firebase'); return; }
+  S.lastWritten = null; const was = $('writeSt').checked; $('writeSt').checked = true; writeStatus(label, 1, 'manual'); $('writeSt').checked = was;
+  toast('Status set to ' + label); confetti(CLASSES[i].color);
+});
+const recal = () => { calReset(); toast('Recalibrating for 20 seconds'); };
+$('recalBtn').onclick = recal; $('recalTop').onclick = recal;
+$('sens').value = CAL.k; $('sensV').textContent = CAL.k + ' sigma';
+$('sens').oninput = e => { CAL.k = Number(e.target.value); $('sensV').textContent = CAL.k + ' sigma'; try { localStorage.setItem('dg-k2', CAL.k); } catch (x) {} };
+const rr = $('ranges');
+CH.forEach(([k, n, col]) => { const d = document.createElement('div'); d.className = 'rr'; d.style.setProperty('--k', col);
+  d.innerHTML = `<span style="color:${col}">${n}</span><div class="rt"><div class="rb"></div><div class="rm" id="rm_${k}" style="left:50%"></div></div><span id="rv_${k}" style="color:var(--mute)">–</span>`; rr.appendChild(d); });
+function updateRanges() {
+  const x = S.plot.at(-1); if (!x || !CAL.stats) return;
+  KEYS.forEach(k => { const st = CAL.stats[k], span = 4 * CAL.k * st.sd, pos = clamp(.5 + (x[k] - st.m) / span, 0, 1), out = Math.abs(x[k] - st.m) / st.sd > CAL.k;
+    const m = $('rm_' + k); m.style.left = pos * 100 + '%'; m.classList.toggle('out', out);
+    $('rv_' + k).textContent = x[k].toFixed(1); });
+}
+document.querySelectorAll('.card.tilt').forEach(el => {
+  el.addEventListener('mousemove', e => { const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; el.style.transform = `perspective(900px) rotateY(${x * 3}deg) rotateX(${-y * 3}deg)`; });
+  el.addEventListener('mouseleave', () => el.style.transform = '');
+});
+
+/* ---------- diagnostics strip ---------- */
+const D = { live: 0, err: '' };
+{ const a = onSample; onSample = function (x) { try { D.live++; a(x); } catch (e) { D.err = 'onSample: ' + e.message; console.error(e); } };
+  const el = document.createElement('div'); el.id = 'dbg'; document.body.appendChild(el);
+  setInterval(() => { el.textContent = `build ${BUILD} | samples ${D.live} | buffer ${S.buffer.length} | fb status ${S.fbStatus ?? '–'}${D.err ? ' | ERROR ' + D.err : ''}`; }, 500); }
+
+startLive(); frame();
+</script>
+</body>
+</html>
