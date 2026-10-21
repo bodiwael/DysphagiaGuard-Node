@@ -1,0 +1,6 @@
+scikit-learn==1.6.1
+PyWavelets
+scipy
+numpy
+flask
+joblib
